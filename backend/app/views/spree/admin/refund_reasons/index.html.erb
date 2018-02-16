@@ -41,7 +41,7 @@
             </span>
           </td>
           <td class="actions">
-            <% if can?(:update, named_type) && named_type.mutable? %>
+            <% if can?(:update, named_type) %>
               <%= link_to_edit named_type, no_text: true %>
             <% end %>
           </td>
