@@ -12,6 +12,7 @@ module Spree
       preference :currency,        :string,  default: ->{ Spree::Config[:currency] }
 
       def compute_package(package)
+        p 'asd'
         compute_from_quantity(package.contents.sum(&:quantity))
       end
 

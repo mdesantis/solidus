@@ -118,4 +118,52 @@ RSpec.describe Spree::UnitCancel do
       end
     end
   end
+
+  describe '#compute_shipping_amount', focus: true do
+    let(:order) { create(:order_ready_to_ship, line_items_count: 3) }
+    let(:shipping_calculator) { create :shipping_flexi_rate_calculator }
+    let(:shipping_method) { create(:shipping_method, name: "UPS", calculator: :shipping_calculator) }
+    let(:stock_location) { create(:stock_location) }
+    let(:shipment) do
+      order.shipments.create!(
+        state: 'pending',
+        cost: 1,
+        inventory_units: order.inventory_units,
+        shipping_rates: [shipping_rate],
+        stock_location: stock_location
+      )
+    end
+    let(:shipping_rate) do
+      Spree::ShippingRate.create!(
+        shipping_method: shipping_method,
+        selected: true
+      )
+    end
+    let(:line_item) { order.line_items.first }
+    let(:inventory_unit) { line_item.inventory_units.first }
+
+    before { order.recalculate }
+
+    subject { unit_cancel.compute_shipping_amount(line_item) }
+
+    context 'when line item has shipping' do
+      it 'works' do
+        described_class.create!(inventory_unit: inventory_unit, reason: described_class::SHORT_SHIP).adjust!
+        inventory_unit.cancel!
+        shipment = order.shipments.first
+        p shipment.shipping_rates.first.shipping_method
+        # begin
+        #   shipment.order.contents.remove(line_item.variant, 1, { shipment: shipment })
+        # rescue => e
+        #   p e.record.errors
+        #   raise e
+        # end
+        # @shipment.order.contents.remove(variant, quantity, { shipment: @shipment })
+        # @shipment.reload if @shipment.persisted?
+        p order.shipments.first.refresh_rates
+        p order.shipments
+        p order.shipments.first.cost
+      end
+    end
+  end
 end

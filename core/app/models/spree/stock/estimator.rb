@@ -18,6 +18,7 @@ module Spree
         raise OrderRequired if package.shipment.order.nil?
 
         rates = calculate_shipping_rates(package)
+        p 'rates', rates
         rates.select! { |rate| rate.shipping_method.available_to_users? } if frontend_only
         choose_default_shipping_rate(rates)
         Spree::Config.shipping_rate_sorter_class.new(rates).sort
@@ -36,6 +37,7 @@ module Spree
         tax_calculator_class = Spree::Config.shipping_rate_tax_calculator_class
         tax_calculator = tax_calculator_class.new(package.shipment.order)
         shipping_methods(package).map do |shipping_method|
+          p 'shipping_method', shipping_method
           cost = shipping_method.calculator.compute(package)
           if cost
             rate = shipping_method.shipping_rates.new(

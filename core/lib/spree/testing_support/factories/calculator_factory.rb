@@ -16,6 +16,11 @@ FactoryBot.define do
     preferred_amount { 10.0 }
   end
 
+  factory :shipping_flexi_rate_calculator, class: 'Spree::Calculator::Shipping::FlexiRate' do
+    preferred_first_item { 1.50 }
+    preferred_additional_item { 1.00 }
+  end
+
   factory :shipping_no_amount_calculator, class: 'Spree::Calculator::Shipping::FlatRate' do
     preferred_amount { 0 }
   end
